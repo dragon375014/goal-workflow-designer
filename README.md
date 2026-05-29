@@ -1,69 +1,74 @@
-# skill-to-goal
+# goal-workflow-designer
 
-> A Claude Code skill that interrogates you until your `/goal` prompt is precise enough to actually work.
+> Two Claude Code skills that interrogate you until your task is shaped into a **precise, executable spec** — a depth `/goal` prompt or a breadth Dynamic Workflow. A design coach, not the engine.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Skill Format](https://img.shields.io/badge/Claude%20Code-skill-purple)](https://code.claude.com/docs/en/skills)
-[![Bilingual](https://img.shields.io/badge/docs-EN%20%2B%20繁中-orange)](SKILL.md)
+[![Skill Format](https://img.shields.io/badge/Claude%20Code-skills-purple)](https://code.claude.com/docs/en/skills)
+[![Bilingual](https://img.shields.io/badge/docs-EN%20%2B%20繁中-orange)](skills/goal/SKILL.md)
 
-`skill-to-goal` is a Claude Code skill that turns vague task descriptions into precise goal prompts for Claude Code, OpenAI Codex, or Manus Agent's `/goal` feature. It is a **front-end coach** for the `/goal` feature, not a replacement for it.
+**This is a *designer*, not a feature.** It does **not** replace — and is **not required to use** — Claude Code's `/goal` or its Dynamic Workflows. These skills are **front-end coaches**: they interrogate you and emit the precise prompt/spec you then feed to those features. The hard part was never *running* `/goal` or *a workflow* — it's **writing the spec that goes into them**. That's what this designs.
 
-You feed it `make this project better`. It walks you through a structured Q&A — five elements (outcome, verification, constraint, iteration policy, error handling) for any task, plus a six-step rubric SOP for subjective work — and outputs a goal prompt that will actually keep the agent iterating for hours instead of quitting in three minutes.
+它是**設計器**，不是功能本身。**不取代、也不需要它才能用** `/goal` 或 Dynamic Workflows。這兩支 skill 是**前端引導器**：反問你、產出精準的 prompt/規格，再由你貼進那些功能。難的從來不是「跑」`/goal` 或 workflow，而是「寫出餵進去的規格」——這就是它設計的東西。
+
+---
+
+## The two skills — depth & breadth (兩支 skill — 深度與廣度)
+
+A vague task can be shaped two ways. This repo ships one skill for each axis:
+
+| Skill | Axis | Shapes your task into… | Reach for it when |
+|---|---|---|---|
+| [**`goal`**](skills/goal/SKILL.md) | **Depth (深度)** | a precise `/goal` prompt — one agent + a rubric, iterating to a quality bar | **one thing** to get right, deep, and converged |
+| [**`workflow-shaper`**](skills/workflow-shaper/SKILL.md) | **Breadth (廣度)** | a runnable Dynamic Workflow — many fresh-context agents in parallel, cross-checked | the **same check/change across many** independent units |
+
+**One-second test for which to use: count how many units.** One thing to perfect → `/goal`. The same check across many things → `workflow-shaper`. They compose — a workflow is the for-loop, a goal is the loop body.
+
+判斷用哪個的一秒法則：**數有幾件**。一件做到完美 → `/goal`；同一個檢查套到很多件 → `workflow-shaper`。兩者可組合（workflow 是 for-loop、goal 是 loop body）。
 
 ---
 
 ## Why this exists
 
-In 2026, Claude Code, OpenAI Codex, and Manus Agent shipped a `/goal` feature within weeks of each other. The feature loops an implementer agent and a reviewer agent until a goal is reached. Anthropic's own research showed that without one, LLMs hit **context anxiety** when their context window fills — they shortcut to a wrap-up and stop, even mid-task.
+In 2026, Claude Code, OpenAI Codex, and Manus Agent shipped a `/goal` feature within weeks of each other; Claude Code later added **Dynamic Workflows** (background multi-agent orchestration). Both loop or fan out agents toward a target. Anthropic's research showed that without a precise target, LLMs hit **context anxiety** when their context window fills — they shortcut to a wrap-up and stop, even mid-task.
 
-But `/goal` only works when "done" is defined precisely. Given a vague prompt, the AI invents its own definition of "done" and quits early. Given a precise one, it iterates for hours.
+But these features only work when the spec is precise. Given a vague prompt, the AI invents its own definition of "done" and quits early — or, for a workflow, fans out on the wrong shape and burns tokens. Given a precise one, it iterates for hours / parallelizes cleanly.
 
-The hard part isn't using `/goal`. It's **writing the prompt that goes into `/goal`**.
-
-This skill automates the prompt-writing part. It is opinionated about what a goal prompt must contain and refuses to let you off the hook with vague answers.
-
----
-
-## What makes this different
-
-A handful of other Claude Code skills do prompt design ([prompt-architect](https://github.com/ckelsoe/prompt-architect), [prompt-improver](https://github.com/ndpvt-web/prompt-improver), [prompt-master](https://github.com/nidhinjs/prompt-master)). They are general-purpose — they will improve any prompt for any use case. `skill-to-goal` is the opposite: laser-focused on the `/goal` execution model.
-
-| Feature | skill-to-goal | Generic prompt skills |
-|---|---|---|
-| Targets `/goal`'s five-element framework | ✅ | ❌ (general frameworks like CO-STAR, RISEN) |
-| Builds a rubric for subjective tasks | ✅ (6-step SOP) | ❌ |
-| Context window health gate | ✅ (Phase 0a) | ❌ |
-| **Goal-eligibility check (3-light system)** | ✅ (Phase 0c) | ❌ |
-| Handoff packaging for context-strained sessions | ✅ (`--resume`) | ❌ |
-| Codebase scan integration via subagent | ✅ (isolated context) | ❌ |
-| Objective vs subjective task branching | ✅ | ❌ (single flow) |
-| Bilingual term parentheticals (EN + 中文) | ✅ | varies |
-
-If you only need to clean up a generic prompt, use one of the others. If you specifically want a goal that will survive long iteration loops in `/goal`, use this one.
+The hard part isn't using `/goal` or a workflow. It's **writing the spec that goes into them**. These skills automate that, and refuse to let you off the hook with vague answers.
 
 ---
 
 ## Installation
 
-This is a user-level skill, available across all Claude Code projects on your machine.
+### Option A — AI auto-install (recommended)
+
+Paste this into your Claude Code session and the agent installs both skills into the right place:
+
+```
+Read https://raw.githubusercontent.com/dragon375014/goal-workflow-designer/main/INSTALL.md
+
+Then install both skills (goal + workflow-shaper) into my user-level ~/.claude/skills/ by following it.
+Show me a diff/summary before writing any file, and don't overwrite a SKILL.md I've edited without asking.
+```
+
+The agent fetches [INSTALL.md](INSTALL.md), places `skills/goal/` and `skills/workflow-shaper/` under `~/.claude/skills/`, and appends the two triggers to your `~/.claude/CLAUDE.md`.
+
+### Option B — Manual
 
 ```bash
-git clone https://github.com/dragon375014/skill-to-goal.git ~/.claude/skills/goal
+git clone https://github.com/dragon375014/goal-workflow-designer.git /tmp/gwd
+cp -r /tmp/gwd/skills/goal           ~/.claude/skills/goal
+cp -r /tmp/gwd/skills/workflow-shaper ~/.claude/skills/workflow-shaper
 ```
 
-Then add the trigger to your `~/.claude/CLAUDE.md`:
+Then add the two trigger blocks (see [INSTALL.md](INSTALL.md) Step 3) to `~/.claude/CLAUDE.md`. These are **user-level** skills — they work across all your Claude Code projects. Output goals are saved under `~/.claude/goals/<name>/`.
 
-```markdown
-# goal
-- **goal** (`~/.claude/skills/goal/SKILL.md`) - Goal prompt design coach. Trigger: `/goal`
-When the user types `/goal`, OR uses natural language indicating they want to design a goal (e.g. "I want to design a goal", "help me write a goal prompt", "我要設計一個 goal"), invoke the Skill tool with `skill: "goal"` before doing anything else.
-```
-
-Output goals will be saved under `~/.claude/goals/<name>/` (the skill creates this directory on first use).
+> ⏫ Upgrading from `skill-to-goal` (the old single-skill repo name)? The repo was renamed and restructured: the goal skill moved from the repo root to `skills/goal/`, and `workflow-shaper` was added. Re-run Option A, or `git pull` and re-copy.
 
 ---
 
 ## Usage
+
+### `/goal` — depth
 
 ```
 /goal <one-line task description>     # full Q&A from scratch
@@ -71,113 +76,94 @@ Output goals will be saved under `~/.claude/goals/<name>/` (the skill creates th
 /goal --resume <draft-name>           # resume an interrupted Q&A
 ```
 
-Natural language also works: typing `I want to design a goal for refactoring the auth module` or `幫我寫個 goal prompt` will trigger the skill.
+It walks you through five elements (outcome, verification, constraint, iteration policy, error handling), plus a six-step rubric SOP for subjective work, and outputs a goal prompt that keeps the agent iterating for hours instead of quitting in three minutes. Natural language triggers too (`幫我寫個 goal prompt`).
 
-> ⚠️ `/goal` with no arguments is intentionally unsupported. You must give the skill at least one sentence to start from — vague triggers produce vague Q&A.
+> ⚠️ `/goal` with no arguments is intentionally unsupported — vague triggers produce vague Q&A.
 
-### Example: objective task (engineering)
+### `workflow-shaper` — breadth
 
-```
-You: /goal drop checkout page response time
+Describe a many-unit task, or say "use a workflow." It runs a **WORTH-IT gate** (5 criteria → green/yellow/red) before anything else:
 
-Skill: ⚠️ Quick context check first — is your current Claude Code session clean,
-       or has it been running a while? (context anxiety affects /goal quality)
-You:   Clean, just opened.
+- 🟢 green → recommends a fan-out shape (parallel / pipeline / map-reduce) and emits a paste-ready `workflow ...` prompt + a draft meta block you can save as a `/<name>` command.
+- 🟡 yellow → offers a middle path (split into short workflows / inline-run one unit first).
+- 🔴 red (single unit, needs intermediate context, needs mid-run sign-off) → **refuses to emit a workflow prompt** and routes you back to a plain skill or `/goal`.
 
-Skill: Should I scan the codebase first to find relevant files?
-You:   Yes.
+It never runs the workflow — it shapes the spec and hands it back. See [skills/workflow-shaper/SKILL.md](skills/workflow-shaper/SKILL.md).
 
-Skill: [spawns Explore subagent — returns: src/checkout/, validatePayment(),
-        vitest configured, lighthouse in devDependencies]
+---
 
-Skill: Task type — objective or subjective?
-You:   Objective.
+## What makes the `/goal` skill different from generic prompt skills
 
-Skill: I have "drop checkout page response time" as the outcome direction.
-       What's the specific target? (e.g. "under 0.2s")
-You:   Under 0.3s on slow 3G.
+A handful of Claude Code skills do prompt design ([prompt-architect](https://github.com/ckelsoe/prompt-architect), [prompt-improver](https://github.com/ndpvt-web/prompt-improver), [prompt-master](https://github.com/nidhinjs/prompt-master)). They are general-purpose. This one is laser-focused on the `/goal` execution model:
 
-Skill: I saw lighthouse in devDependencies — use it for verification?
-You:   Yes, lighthouse mobile slow-3G profile.
-
-[... continues for constraint, iteration policy, error handling ...]
-
-Skill: ✅ Goal saved to ~/.claude/goals/checkout-perf/
-       Run /goal --use checkout-perf in a fresh session for best results.
-```
-
-The resulting `goal.md` is a complete prompt covering all five elements, ready for `/goal`.
-
-### Example: subjective task (writing / design)
-
-For subjective tasks the skill additionally walks you through the **6-step rubric SOP**:
-
-1. Baseline check (do you have a sample AI output?)
-2. Collect "frown points" — specific things that annoyed you
-3. Group frown points into dimensions
-4. For each dimension, write specific `Never do X` rules
-5. List diverse positive directions to avoid overfitting
-6. Output both `goal.md` and `rubric.md`
-
-The rubric is what lets the `/goal` reviewer agent actually judge taste-based outputs. Without one, the reviewer has nothing to compare against, and the loop degenerates.
-
-See `examples/` for complete sample outputs.
+| Feature | this repo | Generic prompt skills |
+|---|---|---|
+| Targets `/goal`'s five-element framework | ✅ | ❌ (general frameworks like CO-STAR, RISEN) |
+| Builds a rubric for subjective tasks | ✅ (6-step SOP) | ❌ |
+| Context window health gate | ✅ (Phase 0a) | ❌ |
+| **Goal-eligibility check (3-light)** | ✅ (Phase 0c) | ❌ |
+| KICK-OFF self-cue (agent actually starts, no "continue" needed) | ✅ | ❌ |
+| Handoff packaging for context-strained sessions | ✅ (`--resume`) | ❌ |
+| Codebase scan via isolated subagent | ✅ | ❌ |
+| **A breadth counterpart for many-unit tasks** | ✅ (`workflow-shaper`) | ❌ |
+| Bilingual term parentheticals (EN + 中文) | ✅ | varies |
 
 ---
 
 ## Design principles
 
-These principles are codified in the skill itself and govern every Q&A round:
+These are codified in the skills and govern every Q&A round:
 
-1. **Interrogate vague answers.** When the user says "better / smoother / more professional", the skill *must* follow up for a measurable or visible standard. Accepting vague answers is a skill failure.
-2. **Smart skipping.** Each round, scan everything already collected and skip known elements. No redundant questions.
-3. **1–3 questions per round.** Long question lists make users abandon.
-4. **Cite source-talk examples.** Show what a good answer looks like, but tell users not to copy verbatim.
+1. **Interrogate vague answers.** "better / smoother / more professional" → the skill *must* follow up for a measurable standard. Accepting vague answers is a failure.
+2. **Smart skipping.** Scan everything already collected; skip known elements.
+3. **1–3 questions per round.** Long lists make users abandon.
+4. **Cite examples to seed thinking** — but tell users not to copy verbatim.
 5. **Subjective tasks require a rubric.** Without one, the reviewer agent has nothing to judge against.
-6. **Context window health above all.** Phase 0a is a gatekeeper. Don't push through to "finish the skill" if the user's context is strained.
-7. **Not every task is `/goal`-shaped.** Phase 0c checks for external credentials, info gaps, human-only decisions, and external blocking dependencies before letting you sink time into Q&A. Yellow → list prerequisites and offer handoff. Red → stop and suggest alternatives. Conservative: any single red flag = overall red.
-8. **Bilingual terminology.** First mention of any technical term writes `English (中文)`. Helps both Chinese readers and English readers building vocabulary on this topic.
+6. **Context window health above all** (Phase 0a gatekeeper).
+7. **Not every task is `/goal`-shaped** (Phase 0c) — and **not every task is worth a workflow** (`workflow-shaper`'s WORTH-IT gate). Both refuse rather than ship a doomed run.
+8. **KICK-OFF is a self-cue.** After printing the kick-off block, the skill makes a tool call *in the same turn* — text alone doesn't reliably start the agent loop.
+9. **Bilingual terminology.** First mention of any term writes `English (中文)`.
 
 ---
 
 ## The Handoff pattern
 
-A novel mechanism this skill introduces — see [docs/handoff-pattern.md](docs/handoff-pattern.md) for the standalone writeup that other skills can adopt.
+A novel mechanism — see [docs/handoff-pattern.md](docs/handoff-pattern.md). When a session is already context-strained, finishing the Q&A then running `/goal` compounds the problem. The skill packages in-progress state into `handoff.md` and tells the user to `/clear` + `/goal --resume <draft-name>` so the actual run lands on a full-context window. Generalizes to any long-running skill.
 
-When a user's Claude Code session is already context-strained at skill invocation, finishing the Q&A and then running `/goal` would compound the problem. The skill instead packages the in-progress state into `handoff.md` and tells the user:
+---
 
-```
-1. /clear                           (wipe current context)
-2. /goal --resume <draft-name>      (resume Q&A on fresh context)
-```
+## Companion repo — structure governance (姐妹 repo — 結構治理)
 
-The fresh session loads the handoff, skips already-answered phases, and continues from the exact next question. `/goal` ultimately runs against a full-context window, dodging context anxiety entirely.
+This repo shapes **what to do** (the task spec). Its companion shapes **how it's built** (the structure):
 
-This pattern generalizes to any long-running skill that meaningfully consumes context. Take it, use it, adapt it.
+> ### [`claude-skills-governance-meta`](https://github.com/dragon375014/claude-skills-governance-meta)
+> Defensive + offensive governance patterns: an architecture-completeness gate (catches "I want to build X" before it's built), cross-layer **trace-lock** (lock a write→display chain so "changed A, forgot B" can't happen), and runnable defensive linters.
+
+**They combine cleanly:**
+
+- `workflow-shaper` here can be **dispatched by** that repo's `architecture-completeness-guardian` (the L0 gate decides "this is a many-unit job" → routes to the breadth shaper).
+- A `/goal` or workflow you design here is **executed under** that repo's trace-lock + governance guard — so a multi-unit change stays SSOT-locked instead of drifting.
+- Mental model: **this repo = the brief; that repo = the guardrails.** Use one for sharper task specs; add the other when your project is big enough to need structural governance (it ships a fitness check that tells you when).
+
+If you only installed one, that's fine — each stands alone. But for a solo developer running long AI sessions on a real codebase, the pair covers both "shape the work" and "don't let the work corrupt the structure."
 
 ---
 
 ## Source material
 
-The methodology this skill encodes is drawn from:
-
-- Anthropic's research on **context anxiety** and the implementer/reviewer architecture
-- Anthropic's **frontend-design** skill case study (the museum website experiment) — the source for the 6-step rubric SOP
-- Andrej Karpathy's writing on **evaluation > prompt engineering**
-- The community insight that `/goal` succeeds or fails entirely on prompt precision
-
-A transcript of the source talk that synthesizes these threads is in [examples/source-transcript.md](examples/source-transcript.md).
+The methodology draws from Anthropic's research on **context anxiety** and the implementer/reviewer architecture, Anthropic's **frontend-design** skill case study (the museum experiment → the 6-step rubric SOP), Karpathy on **evaluation > prompt engineering**, and the community insight that `/goal` succeeds or fails entirely on spec precision. The breadth half draws from Claude Code's **Dynamic Workflows** (background multi-agent orchestration). A transcript is in [examples/source-transcript.md](examples/source-transcript.md).
 
 ---
 
 ## Contributing
 
-PRs and issues welcome. A few principles for contributors:
+PRs and issues welcome. A few principles:
 
-- **Don't add elements to the five-element framework.** It's stable on purpose. If you think something's missing, open an issue first.
-- **Add example goals to `examples/`** if you have interesting outputs from your own use of the skill.
-- **Translations welcome.** The skill is currently bilingual EN/繁中. Other-language support means translating the AskUserQuestion prompts and adding a language-detection branch in Step 5.
-- **Test before PR.** Run the skill on your own machine and confirm the change works end-to-end.
+- **Don't add elements to the five-element framework.** It's stable on purpose. Open an issue first.
+- **Don't widen `workflow-shaper`'s WORTH-IT gate to auto-approve.** The point is that it refuses cheap tasks.
+- **Add example outputs to `examples/`.**
+- **Translations welcome** (currently EN/繁中).
+- **Test before PR** — run the skill end-to-end on your machine.
 
 ---
 
@@ -190,7 +176,12 @@ PRs and issues welcome. A few principles for contributors:
 ## Related
 
 - [Claude Code skills documentation](https://code.claude.com/docs/en/skills)
+- [Claude Code Dynamic Workflows](https://code.claude.com/docs/en/workflows)
 - [awesome-claude-skills](https://github.com/travisvn/awesome-claude-skills)
-- [ComposioHQ/awesome-claude-skills](https://github.com/ComposioHQ/awesome-claude-skills)
 - [prompt-architect](https://github.com/ckelsoe/prompt-architect) — general prompt structurer
-- [prompt-improver](https://github.com/ndpvt-web/prompt-improver) — Aristotelian first-principles prompt design
+
+---
+
+If either skill saved you a debugging session or a wasted `/goal` run, a ko-fi is appreciated but not expected. Everything here is MIT and free to use unconditionally.
+
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/Z8C420A0VI)

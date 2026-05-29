@@ -4,6 +4,24 @@ All notable changes to `skill-to-goal` will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] - 2026-05-29
+
+Turns `skill-to-goal` into `goal-workflow-designer` — a two-skill repo covering both task-shaping axes (depth + breadth).
+
+### Added
+
+- **`workflow-shaper` skill** (breadth) — shapes an already-decided task into a runnable Claude Code Dynamic Workflow. Front WORTH-IT gate (5 criteria → green/yellow/red), fan-out shape recommendation (parallel / pipeline / map-reduce), paste-ready `workflow ...` prompt + draft meta block. Maps `/goal`'s five elements onto workflow stages. Refuses to emit a workflow prompt on a red light.
+- **KICK-OFF self-cue (backported into the `goal` skill)** — after printing the kick-off block, the skill now makes a tool call *in the same turn* to start round 1, instead of ending the turn and waiting for the user to type "continue". New core principle #9; wired into Step 7 (`--use` run) and Step 11 (final run).
+- **AI-executable install** ([INSTALL.md](INSTALL.md)) — paste the repo link into a session and the agent installs both skills to `~/.claude/skills/` and wires the triggers. Mirrors the companion repo's onboarding pattern.
+- **Companion-repo cross-link** — README documents how this pairs with [claude-skills-governance-meta](https://github.com/dragon375014/claude-skills-governance-meta) (this = the brief; that = the guardrails).
+- **Ko-fi link.**
+
+### Changed
+
+- **Repo renamed `skill-to-goal` → `goal-workflow-designer`** (GitHub keeps a redirect from the old name).
+- **Restructured to a `skills/` layout**: the goal skill moved from the repo-root `SKILL.md` to `skills/goal/SKILL.md`; `workflow-shaper` lives at `skills/workflow-shaper/SKILL.md`. Install now copies per-skill folders instead of cloning the whole repo into `~/.claude/skills/goal`.
+- README reframed around the depth/breadth pair, with an explicit "designer, not the engine, not required to use /goal" clarifier.
+
 ## [0.1.0] - 2026-05-25
 
 Initial release.

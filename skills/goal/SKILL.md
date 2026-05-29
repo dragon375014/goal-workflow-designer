@@ -49,6 +49,7 @@ This skill automates that forcing function.
 6. **Cite examples to seed thinking**: Offer source-talk examples like "e.g. response time under 0.2s", but tell users not to copy verbatim.
 7. **Subjective tasks require a rubric**: No rubric = the reviewer agent has nothing to judge against = wasted tokens.
 8. **Context window health above all**: Phase 0a is a gatekeeper. If the user's context is unhealthy, advise restart. Do not push through to "finish the skill".
+9. **KICK-OFF is a self-cue, not a user-facing plan / KICK-OFF 是寫給自己的 self-cue，不是給使用者看的藍圖**: After printing the KICK-OFF block (Steps 7 / 11), you **must immediately make a tool call in the same turn** to begin step 1 (Read / Glob / TodoWrite etc.). Do not end the turn, do not yield to the user. Text instructions pull an LLM far weaker than its default "print and stop" behavior — only an actual same-turn tool call (demonstration / 示範) reliably starts the agent loop. Symptom of violating this: the user has to type "continue" / "請接續完成" before anything happens.
 
 ---
 
@@ -304,7 +305,32 @@ options:
   - { label: "Just give me the path", description: "I'll print the full path; you paste it where you want (recommended for long tasks)" }
 ```
 
-- **Run directly** → print `/goal <full goal.md contents>` to chat, with reminder: "Skill Q&A already consumed some context. If unsure whether enough remains, switch to 'just give me the path' and run `/goal --use <name>` in a fresh session — that way /goal gets a full-context window"
+- **Run directly** → execute these in order (do not reorder):
+
+  **A. Context reminder** (one line): "Skill Q&A already consumed some context. If unsure whether enough remains, choose 'just give me the path' and run `/goal --use <name>` in a fresh session for a full-context window."
+
+  **B. Print the full `goal.md` contents** to chat (all sections: Codebase Context / Outcome / Verification / Constraint / Iteration policy / Error handling / Rubric reference).
+
+  **C. Immediately print the KICK-OFF block** (this is what actually makes the agent start — do not omit):
+
+  ```
+  ─────────────────────────────────────────────
+  🚀 KICK-OFF (start executing from the end of this block — do not yield to the user)
+
+  Above is the complete goal prompt. Begin iteration round 1 now:
+  1. Round 1 implementation: work from the Outcome + Constraint sections; obey every skill that auto-triggers from CLAUDE.md
+  2. End each round by running everything in the Verification section (E2E / reviewer agent / regression scan)
+  3. Subjective tasks (rubric.md exists): each round, spawn a reviewer agent to score the output against rubric.md; any dimension below the pass bar → list the specific violations → fix next round
+  4. Record each round in the structure defined by the Iteration policy section
+  5. Obey the Error handling section (max rounds, when to pause-and-report vs continue)
+
+  Do NOT ask "should I start", do NOT list a plan for confirmation, do NOT yield to the user. Use tools, edit files, run tests. Stop only when stuck (per Error handling).
+
+  Begin round 1 now.
+  ─────────────────────────────────────────────
+  ```
+
+  **D. In the SAME turn, immediately make a tool call to start step 1** (core principle #9): read the loaded `goal.md` Outcome + Constraint to decide the first action (Read the first handoff if it's a relay task / Glob for the target files / TodoWrite to split Outcome into subtasks). Do not end the turn after printing KICK-OFF. Symptom of getting this wrong: the user has to type "continue" before anything moves.
 - **Just give path** → print full path to `goal.md`, plus `rubric.md` path if subjective
 
 ### Step 8 — `--resume` handoff
@@ -468,7 +494,7 @@ options:
     - run /goal --use <name> there → /goal starts with a full context window, far less prone to context anxiety
   Still want to run now?
   ```
-  After re-confirm, paste `/goal <full goal.md contents>` to chat
+  After re-confirm: (A) print the full `goal.md` contents, (B) immediately print the KICK-OFF block (same one as Step 7C), then (C) **in the same turn make a tool call to start round 1** (per core principle #9 — do not yield to the user after printing KICK-OFF, or they'll have to type "continue").
 - **Just save** → print:
   ```
   ✅ Goal saved to: ~/.claude/goals/<name>/
