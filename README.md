@@ -6,6 +6,8 @@
 [![Skill Format](https://img.shields.io/badge/Claude%20Code-skills-purple)](https://code.claude.com/docs/en/skills)
 [![Bilingual](https://img.shields.io/badge/docs-EN%20%2B%20繁中-orange)](skills/goal/SKILL.md)
 
+> 🇹🇼 **繁體中文讀者** → 看白話中文說明：[**README-tw.md**](README-tw.md)（這是什麼、裝了有什麼好處、怎麼用，全中文）
+
 **This is a *designer*, not a feature.** It does **not** replace — and is **not required to use** — Claude Code's `/goal` or its Dynamic Workflows. These skills are **front-end coaches**: they interrogate you and emit the precise prompt/spec you then feed to those features. The hard part was never *running* `/goal` or *a workflow* — it's **writing the spec that goes into them**. That's what this designs.
 
 它是**設計器**，不是功能本身。**不取代、也不需要它才能用** `/goal` 或 Dynamic Workflows。這兩支 skill 是**前端引導器**：反問你、產出精準的 prompt/規格，再由你貼進那些功能。難的從來不是「跑」`/goal` 或 workflow，而是「寫出餵進去的規格」——這就是它設計的東西。
