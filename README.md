@@ -175,6 +175,16 @@ PRs and issues welcome. A few principles:
 
 ---
 
+## Ecosystem
+
+This repo is the **shaping layer** of a five-repo AI-dev toolchain — full map: [ai-dev-toolkit/ECOSYSTEM.md](https://github.com/dragon375014/ai-dev-toolkit/blob/main/ECOSYSTEM.md).
+
+- **Upstream** — [`spec-sonar`](https://github.com/dragon375014/spec-sonar) (private while under validation) converges a vague product idea into a spec (`idea-to-spec`) and decomposes it into a goal graph (`goal-decomposer`). Whole-spec decomposition belongs there; single-task precision belongs here — the skills already defer to each other along that line.
+- **Sideways** — [`claude-skills-governance-meta`](https://github.com/dragon375014/claude-skills-governance-meta) guards the code your shaped task produces; [`agent-work-board`](https://github.com/dragon375014/agent-work-board) keeps parallel sessions from colliding while they run it.
+- **Canonical note** — `skills/` here are the canonical copies; installed copies under `~/.claude/skills/` are deployments. PR generalizable improvements back.
+
+---
+
 ## Related
 
 - [Claude Code skills documentation](https://code.claude.com/docs/en/skills)
