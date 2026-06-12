@@ -41,7 +41,7 @@ The talk then generalizes the rubric-building process into a 6-step SOP anyone c
 
 The talk's closing argument: **evaluation, not prompt engineering, is what determines AI output quality.** Writing a rubric is ostensibly for the AI — but its real value is forcing *you* to put into words the taste that previously only lived in your head. Once it's in words, the AI can hold the line at scale.
 
-This is the methodology `skill-to-goal` automates: the Q&A walks you through articulating outcome, verification, constraint, iteration policy, error handling, and (for subjective tasks) a complete rubric — codifying what was previously implicit in your head.
+This is the methodology this repo's `goal` skill automates: the Q&A walks you through articulating outcome, verification, constraint, iteration policy, error handling, and (for subjective tasks) a complete rubric — codifying what was previously implicit in your head.
 
 ---
 

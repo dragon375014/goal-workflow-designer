@@ -2,7 +2,7 @@
 
 > A reusable pattern for long-running Claude Code skills that meaningfully consume context window.
 
-This document describes the **Handoff Pattern** that `skill-to-goal` introduces. The pattern is extracted from `SKILL.md` and documented separately so other skill authors can adopt it without needing to reverse-engineer the implementation.
+This document describes the **Handoff Pattern** that `goal-workflow-designer` introduces. The pattern is extracted from `SKILL.md` and documented separately so other skill authors can adopt it without needing to reverse-engineer the implementation.
 
 ---
 
@@ -156,11 +156,11 @@ If your skill has branches (e.g. "subjective task only" sub-flow), record the br
 
 ## Reference implementation
 
-`skill-to-goal` implements this pattern in full. See:
+`goal-workflow-designer`'s `goal` skill implements this pattern in full. See:
 
-- `SKILL.md` Step 2 (Phase 0a) for the gatekeeper check
-- `SKILL.md` Step 9 for state serialization
-- `SKILL.md` Step 8 for the `--resume` skip logic
+- `skills/goal/SKILL.md` Step 2 (Phase 0a) for the gatekeeper check
+- `skills/goal/SKILL.md` Step 9 for state serialization
+- `skills/goal/SKILL.md` Step 8 for the `--resume` skip logic
 
 The handoff file is written to `~/.claude/goals/<draft-name>/handoff.md` and includes both task state and a `Codebase scan done?` flag so resume can skip the expensive scan step if already complete.
 
@@ -176,6 +176,6 @@ The handoff file is written to `~/.claude/goals/<draft-name>/handoff.md` and inc
 
 ## Origin
 
-This pattern was developed for `skill-to-goal` after recognizing that the very skill meant to *improve* `/goal` outputs was systematically *degrading* them by consuming context before `/goal` even started.
+This pattern was developed for this repo's `goal` skill after recognizing that the very skill meant to *improve* `/goal` outputs was systematically *degrading* them by consuming context before `/goal` even started.
 
 If you adopt the pattern in your own skill, attribution is appreciated but not required (MIT license). A short link back to this document helps other skill authors find the pattern.

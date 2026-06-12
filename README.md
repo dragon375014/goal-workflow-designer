@@ -136,16 +136,14 @@ A novel mechanism — see [docs/handoff-pattern.md](docs/handoff-pattern.md). Wh
 
 ## Ecosystem
 
-This skill is part of a **six-repo AI-dev toolchain** by [dragon375014](https://github.com/dragon375014).
+This repo is the **shaping layer** of a **five-public-repo AI-dev toolchain** by [dragon375014](https://github.com/dragon375014). Full topology, routing rules, and canonical skill ownership → [**ECOSYSTEM.md**](https://github.com/dragon375014/specmit/blob/main/ECOSYSTEM.md)
 
-**One-command install** (drops all six tools into the right place):
+**One-command install** (drops all five tools into the right place):
 ```bash
 npx specmit init
 ```
 
-Full topology, routing rules, and canonical skill ownership → [**ai-dev-toolkit/ECOSYSTEM.md**](https://github.com/dragon375014/ai-dev-toolkit/blob/master/ECOSYSTEM.md)
-
-Siblings: [spec-sonar](https://github.com/dragon375014/spec-sonar) · [specmit](https://github.com/dragon375014/specmit) · [agent-work-board](https://github.com/dragon375014/agent-work-board) · [claude-skills-governance-meta](https://github.com/dragon375014/claude-skills-governance-meta) · [ai-dev-toolkit](https://github.com/dragon375014/ai-dev-toolkit)
+Siblings: [spec-sonar](https://github.com/dragon375014/spec-sonar) · [specmit](https://github.com/dragon375014/specmit) · [claude-skills-governance-meta](https://github.com/dragon375014/claude-skills-governance-meta) · [agent-work-board](https://github.com/dragon375014/agent-work-board) — each stands alone; install only what you need.
 
 ---
 
@@ -203,16 +201,6 @@ PRs and issues welcome. A few principles:
 ## License
 
 [MIT](LICENSE). Do whatever you want with it; attribution appreciated but not required.
-
----
-
-## Ecosystem
-
-This repo is the **shaping layer** of a six-repo AI-dev toolchain — full map: [ai-dev-toolkit/ECOSYSTEM.md](https://github.com/dragon375014/ai-dev-toolkit/blob/HEAD/ECOSYSTEM.md).
-
-- **Upstream** — [`spec-sonar`](https://github.com/dragon375014/spec-sonar) (private while under validation) converges a vague product idea into a spec (`idea-to-spec`) and decomposes it into a goal graph (`goal-decomposer`). Whole-spec decomposition belongs there; single-task precision belongs here — the skills already defer to each other along that line.
-- **Sideways** — [`claude-skills-governance-meta`](https://github.com/dragon375014/claude-skills-governance-meta) guards the code your shaped task produces; [`agent-work-board`](https://github.com/dragon375014/agent-work-board) keeps parallel sessions from colliding while they run it.
-- **Canonical note** — `skills/` here are the canonical copies; installed copies under `~/.claude/skills/` are deployments. PR generalizable improvements back.
 
 ---
 

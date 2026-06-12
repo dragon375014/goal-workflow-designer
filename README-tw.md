@@ -102,6 +102,8 @@ cp -r /tmp/gwd/skills/workflow-shaper ~/.claude/skills/workflow-shaper
 
 然後把觸發設定（[INSTALL.md](INSTALL.md) 第 3 步那兩段）貼進你的 `~/.claude/CLAUDE.md`。裝完後，你設計出來的 goal 會存在 `~/.claude/goals/<名字>/`。
 
+> ⏫ 從舊名 `skill-to-goal`（還只有一支 skill 時的 repo 名）升級上來？repo 已改名並重整結構：goal skill 從 repo 根目錄搬進 `skills/goal/`，還新增了 `workflow-shaper`。重跑一次方法 A，或 `git pull` 後重新複製一遍即可。
+
 ---
 
 ## 怎麼使用
@@ -132,11 +134,58 @@ cp -r /tmp/gwd/skills/workflow-shaper ~/.claude/skills/workflow-shaper
 
 ---
 
+## `/goal` skill 和一般 prompt skill 有什麼不同？
+
+Claude Code 圈子裡已經有幾支做 prompt 設計的 skill（[prompt-architect](https://github.com/ckelsoe/prompt-architect)、[prompt-improver](https://github.com/ndpvt-web/prompt-improver)、[prompt-master](https://github.com/nidhinjs/prompt-master)），它們走的是通用路線。這一支則是死咬著 `/goal` 的執行模型在做：
+
+| 功能 | 本 repo | 一般 prompt skill |
+|---|---|---|
+| 對準 `/goal` 的五元素框架 | ✅ | ❌（用 CO-STAR、RISEN 這類通用框架）|
+| 幫主觀任務建一張評分表 | ✅（6 步 SOP）| ❌ |
+| 記憶體（context）健康度閘門 | ✅（Phase 0a）| ❌ |
+| **「適不適合做成 goal」檢查（三燈號）** | ✅（Phase 0c）| ❌ |
+| KICK-OFF 自我提示（AI 真的會開工，不用你再打「continue」）| ✅ | ❌ |
+| 記憶體吃緊時的接力打包 | ✅（`--resume`）| ❌ |
+| 用隔離的 subagent 掃描程式碼庫 | ✅ | ❌ |
+| **多件事任務有廣度搭檔** | ✅（`workflow-shaper`）| ❌ |
+| 術語中英對照（EN + 中文） | ✅ | 不一定 |
+
+---
+
+## 設計原則
+
+這九條寫死在 skill 裡，每一輪問答都照著走：
+
+1. **模糊答案一定追問。**「好一點／順一點／專業一點」→ 必須追到一個可以衡量的標準，放過模糊答案就是失職。
+2. **聰明跳過。** 每輪先掃描已經收集到的答案，已知的元素不重複問。
+3. **每輪只問 1–3 題。** 一次丟一長串題目，人就放棄了。
+4. **舉例幫你起頭** —— 但會提醒你別照抄。
+5. **主觀任務一定要有評分表。** 沒有評分表，負責審核的 AI 就沒有東西可以評。
+6. **記憶體健康度最優先**（Phase 0a 守門）。
+7. **不是每件事都適合 `/goal`**（Phase 0c）—— 也**不是每件事都值得開 workflow**（`workflow-shaper` 的「值不值得」閘門）。兩邊都寧可拒絕，也不送出一場注定失敗的執行。
+8. **KICK-OFF 是自我提示。** 印出 kick-off 區塊後，skill 會在同一回合直接呼叫工具開工 —— 光靠文字不一定能讓 AI 真的動起來。
+9. **術語中英對照。** 每個術語第一次出現都寫成 `English（中文）`。
+
+---
+
 ## 接力機制（Handoff）
 
 一個很實用的小設計（細節見 [docs/handoff-pattern.md](docs/handoff-pattern.md)）：當你的對話記憶體已經快滿，這時硬把問答做完、再去跑 `/goal`，只會讓品質一起下滑。
 
 所以這支 skill 會在記憶體吃緊時，**把目前進度打包成一個檔案**，叫你 `/clear` 清空、再用 `/goal --resume <草稿名>` 在一個全新、記憶體滿格的對話裡接續 —— 真正要跑的那一段，就會落在最清醒的狀態下。
+
+---
+
+## 生態系（Ecosystem）
+
+本 repo 是 [dragon375014](https://github.com/dragon375014) **五個公開 repo 的 AI 開發工具鏈**裡的**「塑形層」**（shaping layer）。完整地圖、分流規則、各 skill 的歸屬 → [**ECOSYSTEM.md**](https://github.com/dragon375014/specmit/blob/main/ECOSYSTEM.md)
+
+**一個指令裝整套**（五個工具一次裝到對的位置）：
+```bash
+npx specmit init
+```
+
+姊妹 repo：[spec-sonar](https://github.com/dragon375014/spec-sonar) · [specmit](https://github.com/dragon375014/specmit) · [claude-skills-governance-meta](https://github.com/dragon375014/claude-skills-governance-meta) · [agent-work-board](https://github.com/dragon375014/agent-work-board) —— 每個都能獨立使用，要哪個裝哪個。
 
 ---
 
@@ -168,9 +217,36 @@ cp -r /tmp/gwd/skills/workflow-shaper ~/.claude/skills/workflow-shaper
 
 ---
 
+## 素材來源
+
+這套方法論的出處：Anthropic 關於 **context anxiety（脈絡焦慮）**與「實作者／審核者」架構的研究、Anthropic **frontend-design** skill 的案例（博物館實驗 → 6 步評分表 SOP）、Karpathy 的「評估比 prompt 工程更重要」、加上社群的共同體會 ——「`/goal` 的成敗完全取決於規格有多精準」。廣度那一半則參考 Claude Code 的 **Dynamic Workflows**（背景多 agent 編排）。原始對談的逐字稿在 [examples/source-transcript.md](examples/source-transcript.md)。
+
+---
+
+## 貢獻
+
+歡迎開 PR 跟 issue。幾個原則：
+
+- **不要往五元素框架裡加新元素。** 它的穩定是刻意的，想加請先開 issue 討論。
+- **不要把 `workflow-shaper` 的「值不值得」閘門放寬成自動放行。** 它存在的意義就是擋掉不划算的任務。
+- **歡迎往 `examples/` 加範例輸出。**
+- **歡迎翻譯**（目前有英文／繁中）。
+- **送 PR 前先測過** —— 在自己的機器上把 skill 完整跑一遍。
+
+---
+
 ## 授權
 
 [MIT](LICENSE)。隨你怎麼用都行，標註出處感激但不強制。
+
+---
+
+## 相關專案
+
+- [Claude Code skills 官方文件](https://code.claude.com/docs/en/skills)
+- [Claude Code Dynamic Workflows](https://code.claude.com/docs/en/workflows)
+- [awesome-claude-skills](https://github.com/travisvn/awesome-claude-skills)
+- [prompt-architect](https://github.com/ckelsoe/prompt-architect) —— 通用型的 prompt 結構器
 
 ---
 
