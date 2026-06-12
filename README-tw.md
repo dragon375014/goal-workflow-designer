@@ -36,6 +36,7 @@
 
 - **一件**事要磨到完美 → 用 `goal`（一個師傅 + 評分表）
 - **很多件**要套同一個檢查 → 用 `workflow-shaper`（工頭 + 一整組人）
+- **很多件不一樣的事、而且有先後依賴**（A 做完 B 才能開始）→ 那是「規格分解」，見下方姊妹 repo **spec-sonar**（建築師畫施工順序圖）
 
 > 用咖啡來比喻：
 > - 把**一支配方**調到對味 → 師傅 + 評分表（深度）
@@ -139,9 +140,24 @@ cp -r /tmp/gwd/skills/workflow-shaper ~/.claude/skills/workflow-shaper
 
 ---
 
-## 姊妹 repo —— 結構治理
+## 姊妹 repo
 
-這個 repo 管的是**「要做什麼」**（任務怎麼講清楚）。它有一個姊妹 repo 管的是**「做出來的東西結構別爛掉」**：
+### spec-sonar —— 規格側
+
+這個 repo 是**「執行側」**（一件事磨深、或很多件平行跑）。[`spec-sonar`](https://github.com/dragon375014/spec-sonar) 是**「規格側」**（要做的到底是什麼）：`idea-to-spec` 用暗區問答把模糊的產品想法收斂成規格，`goal-decomposer` 再把規格編譯成**帶依賴順序的 goal 圖**——它產出的 `G*.md` 用的正是本 repo `/goal` 的**同一套五元素格式**，可以直接用 `/goal` 式的 KICK-OFF 執行。
+
+| 你要的是 | 用 | 在哪個 repo |
+|---|---|---|
+| 把完整產品想法收斂成規格 | `idea-to-spec` | spec-sonar |
+| 把規格拆成帶依賴順序的執行單元 | `goal-decomposer` | spec-sonar |
+| 把一件事磨成可迭代的 goal prompt | `/goal` | 本 repo |
+| 同一個檢查跑 N 件獨立的事 | `workflow-shaper` | 本 repo |
+
+完整鏈路：`idea-to-spec → goal-decomposer → goals/G*.md → 每個用 /goal 式 KICK-OFF 執行（深度），同型子任務用 workflow-shaper 扇出（廣度）`。
+
+### claude-skills-governance-meta —— 結構治理
+
+這個 repo 管的是**「要做什麼」**（任務怎麼講清楚）。治理姊妹 repo 管的是**「做出來的東西結構別爛掉」**：
 
 > ### [`claude-skills-governance-meta`](https://github.com/dragon375014/claude-skills-governance-meta)
 > 一套防守 + 進攻的治理機制：架構完整性閘門（在你「我要做 X」還沒動手前就先攔下來檢查）、跨層 trace-lock（把「資料從寫入到顯示」的鏈路鎖死，避免「改了 A 忘了 B」）、還有可以實際跑的防禦型檢查器。

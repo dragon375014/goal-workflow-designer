@@ -4,6 +4,17 @@ All notable changes to `skill-to-goal` will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.1] - 2026-06-10
+
+Ecosystem conflict fixes — driven by a real-world conflict analysis run by the companion repo [spec-sonar](https://github.com/dragon375014/spec-sonar)'s Conflict Analysis Mode, which scanned the 4 skills (goal, workflow-shaper, idea-to-spec, goal-decomposer) coexisting in one environment and found 5 conflicts. Full report: spec-sonar `examples/conflict-report-goal-workflow-designer.md`.
+
+### Added
+
+- **`goal`: outbound routing section ("When NOT this skill")** — the systemic finding was that `goal` had zero outbound deferrals while owning the most generic name + the `/goal` command, making it the ecosystem's accretion point. It now conditionally defers: a full software product → `idea-to-spec` (if installed); a finished spec to decompose into a dependency graph → `goal-decomposer` (if installed). Deferrals are install-conditional so standalone installs keep working. (Fixes conflicts C1 + C3.)
+- **`goal`: blocked-state / surface-coverage question (Step 5.6)** — backported from field use: UI / action-gating tasks are now asked about blocked states and rendering-surface coverage, the single most common UI miss.
+- **`workflow-shaper`: symmetric SKIP clause** — heterogeneous modules with a dependency order (A before B) → `goal-decomposer` (if installed); a flat fan-out would lose the ordering. The one-second test now has three arms: one thing → `/goal`; same check across many → workflow; many different things with dependency order → `goal-decomposer`. (Fixes conflict C2.)
+- **README (EN + tw): spec-sonar companion section** — documents the spec-side / execution-side split and the shared five-element goal format that makes spec-sonar's `G*.md` files directly executable via `/goal`-style KICK-OFF.
+
 ## [0.2.0] - 2026-05-29
 
 Turns `skill-to-goal` into `goal-workflow-designer` — a two-skill repo covering both task-shaping axes (depth + breadth).

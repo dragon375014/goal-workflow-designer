@@ -1,6 +1,6 @@
 ---
 name: goal
-description: Goal Prompt design coach. Turns vague tasks into precise goal prompts that fit the five-element framework (outcome / verification / constraint / iteration policy / error handling) plus an optional rubric — so Claude Code's /goal, OpenAI Codex's /goal, or Manus Agent's /goal has a clear target to iterate against. 把模糊任務透過反問轉成五元素 + rubric 的精確 goal prompt。
+description: Goal Prompt design coach. Turns vague tasks into precise goal prompts that fit the five-element framework (outcome / verification / constraint / iteration policy / error handling) plus an optional rubric — so Claude Code's /goal, OpenAI Codex's /goal, or Manus Agent's /goal has a clear target to iterate against. 把模糊任務透過反問轉成五元素 + rubric 的精確 goal prompt。Outbound routing — a full software product (multiple features, deployed, used by others) → defer to idea-to-spec if installed; a finished spec to decompose into a dependency-ordered goal graph → defer to goal-decomposer if installed. 完整軟體產品讓位給 idea-to-spec、整份規格拆成依賴圖讓位給 goal-decomposer（皆以已安裝為前提，未安裝則繼續但須提醒用戶範圍差異）。
 trigger: /goal
 ---
 
@@ -28,6 +28,17 @@ Turns a vague "I want to do X" into a precise goal prompt that satisfies the **f
 Also triggered by **natural language** — phrases like "I want to design a goal", "help me write a goal prompt", "我要設計一個 goal", "幫我寫個 goal prompt" should fire this skill.
 
 ⚠️ No-argument `/goal` is intentionally unsupported — users must provide at least one sentence so the skill has a starting point.
+
+## When NOT this skill — outbound routing (對外讓位)
+
+Check intent before starting the Q&A. Two cases are NOT this skill's job:
+
+| User intent looks like | Route to | Why |
+|---|---|---|
+| A **full software product** — multiple features, deployed, used by others ("I want to build an app / platform / 我想做一個系統") | `idea-to-spec` (if installed) | That's product-requirement convergence (multi-round dark-zone Q&A), not a single-task goal prompt. Not installed → continue here, but warn the user this is product-scale and one goal prompt covers only a slice. |
+| A **finished spec to split into dependency-ordered execution units** ("decompose this spec", "把規格拆成 goal 圖") | `goal-decomposer` (if installed) | This skill's "goal" = ONE task's five-element prompt. goal-decomposer's "goal" = a node (G1/G2…) in a dependency graph compiled from a spec — same five-element format, different granularity. Not installed → continue here one module at a time. |
+
+(The breadth sibling rule already exists: the same check across many independent units → `workflow-shaper`.)
 
 ## What `/goal` is for
 
@@ -223,6 +234,25 @@ question: "What should each round record? This feeds the reviewer agent's iterat
 question: "When stuck / hitting a wall — pause and report, or keep trying? What should the report include?"
 ```
 - Default offer: "Typical: 'what was tried, what's blocking, what info would unblock.' Use this or customize?"
+
+#### 5.6 Blocked / negative states (UI 或「動作型」任務必問)
+
+**Only for tasks that render UI or gate a user action** (purchase / checkout / booking / 下單 / 報名 / 領取 / submit). Skip for pure backend / data-only goals.
+
+Happy-path bias makes goals describe only the success state ("user sees cheaper price") and silently omit the **blocked state** + **surface coverage** — the single most common UI miss. Force it into the goal:
+
+```
+question: "這個任務有沒有『使用者被擋下 / 不能做』的狀態（如等級不足、缺貨、餘額不夠、資格不符）？如果有，被擋時要怎麼呈現？"
+header: "Blocked state"
+options:
+  - { label: "有，需要明確呈現", description: "我會把『被擋狀態 contract』寫進 Outcome/Verification：① 動作前就揭露 ② 視覺顯著非小灰字 ③ 跨所有渲染面一致（list card / detail / modal / POS）④ 給可行動的解法" }
+  - { label: "有，但刻意靜默", description: "確認是刻意（如安全考量不洩漏存在），記進 Constraint" }
+  - { label: "沒有被擋狀態", description: "純展示 / 無條件動作，跳過" }
+```
+
+- 若選「需要明確呈現」→ 在 **Outcome** 寫入四點 blocked-state contract，並在 **Verification** 加「逐一目視每個渲染面（不只一面）」。
+- **追問 surface 清單**：「哪些畫面會顯示這個項目 / 這個動作按鈕？」逐一列出（提醒：storefront 常有 2-4 種 card layout，別只改一個）。
+- 對應執行時 skill：`action-gating-surface-disclosure`（動手改閘門時會自動觸發，與本步互為設計時 / 執行時雙保險）。
 
 ### Step 6 — Phase C: Rubric (subjective tasks only)
 

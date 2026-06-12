@@ -23,7 +23,7 @@ These two skills are siblings. They both take a vague task and shape it into a p
 | Solves | "one thing done right, deep, and converged" | "a pile of things split, parallelized, cross-verified, beyond one context window" |
 | Gate | `/goal` Phase 0c Goal-Eligibility (is the task `/goal`-shaped?) | this skill's WORTH-IT gate (is the task worth a workflow?) |
 
-**They compose**: a workflow is the for-loop, a goal is the loop body. A workflow's verify stage can embed a goal-style rubric. The one-second test for which to reach for: **count how many units** — one thing to perfect → `/goal`; the same check across many things → a workflow.
+**They compose**: a workflow is the for-loop, a goal is the loop body. A workflow's verify stage can embed a goal-style rubric. The one-second test for which to reach for: **count how many units** — one thing to perfect → `/goal`; the same check across many things → a workflow; many *different* things with a dependency order (A must finish before B starts) → `goal-decomposer` (if installed), not a flat fan-out.
 
 ---
 
@@ -48,6 +48,7 @@ These two skills are siblings. They both take a vague task and shape it into a p
 - You need intermediate results to stay in the main context for follow-up, or you need mid-run human sign-off → a workflow discards intermediate state and runs in the background, which gets in the way. Use inline `/goal`.
 - Pure copy / pure styling / a one-line typo.
 - The user is still at the **"should we even do this?" decision layer** → that is a requirements / architecture-gate question (if you adopted the companion `claude-skills-governance-meta`, that's its `architecture-completeness-guardian`'s job), not this skill. This skill assumes the decision is made; it only answers "breadth-or-not, and how to organize."
+- The units are **heterogeneous modules with a dependency order** (A must finish before B can start — e.g. a spec decomposed into modules, not N same-shaped checks) → that's `goal-decomposer`'s job (if installed): it compiles a spec into a dependency-ordered goal graph. A workflow is a flat fan-out and would lose the ordering.
 
 ---
 

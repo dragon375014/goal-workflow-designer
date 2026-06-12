@@ -23,9 +23,9 @@ A vague task can be shaped two ways. This repo ships one skill for each axis:
 | [**`goal`**](skills/goal/SKILL.md) | **Depth (深度)** | a precise `/goal` prompt — one agent + a rubric, iterating to a quality bar | **one thing** to get right, deep, and converged |
 | [**`workflow-shaper`**](skills/workflow-shaper/SKILL.md) | **Breadth (廣度)** | a runnable Dynamic Workflow — many fresh-context agents in parallel, cross-checked | the **same check/change across many** independent units |
 
-**One-second test for which to use: count how many units.** One thing to perfect → `/goal`. The same check across many things → `workflow-shaper`. They compose — a workflow is the for-loop, a goal is the loop body.
+**One-second test for which to use: count how many units.** One thing to perfect → `/goal`. The same check across many things → `workflow-shaper`. Many *different* things with a dependency order → that's spec decomposition, see the companion repo [spec-sonar](#companion-repos) below. They compose — a workflow is the for-loop, a goal is the loop body.
 
-判斷用哪個的一秒法則：**數有幾件**。一件做到完美 → `/goal`；同一個檢查套到很多件 → `workflow-shaper`。兩者可組合（workflow 是 for-loop、goal 是 loop body）。
+判斷用哪個的一秒法則：**數有幾件**。一件做到完美 → `/goal`；同一個檢查套到很多件 → `workflow-shaper`；很多件「異質且有依賴順序」→ 那是規格分解，見下方姐妹 repo spec-sonar。兩者可組合（workflow 是 for-loop、goal 是 loop body）。
 
 ---
 
@@ -134,9 +134,40 @@ A novel mechanism — see [docs/handoff-pattern.md](docs/handoff-pattern.md). Wh
 
 ---
 
-## Companion repo — structure governance (姐妹 repo — 結構治理)
+## Ecosystem
 
-This repo shapes **what to do** (the task spec). Its companion shapes **how it's built** (the structure):
+This skill is part of a **six-repo AI-dev toolchain** by [dragon375014](https://github.com/dragon375014).
+
+**One-command install** (drops all six tools into the right place):
+```bash
+npx specmit init
+```
+
+Full topology, routing rules, and canonical skill ownership → [**ai-dev-toolkit/ECOSYSTEM.md**](https://github.com/dragon375014/ai-dev-toolkit/blob/master/ECOSYSTEM.md)
+
+Siblings: [spec-sonar](https://github.com/dragon375014/spec-sonar) · [specmit](https://github.com/dragon375014/specmit) · [agent-work-board](https://github.com/dragon375014/agent-work-board) · [claude-skills-governance-meta](https://github.com/dragon375014/claude-skills-governance-meta) · [ai-dev-toolkit](https://github.com/dragon375014/ai-dev-toolkit)
+
+---
+
+<a name="companion-repos"></a>
+## Companion repos (姐妹 repo)
+
+### spec-sonar — the spec side (規格側)
+
+This repo is the **execution side** (how to run one task deep, or many units wide). [`spec-sonar`](https://github.com/dragon375014/spec-sonar) is the **spec side** (what to build): `idea-to-spec` converges a vague product idea into a spec via dark-zone Q&A, and `goal-decomposer` compiles that spec into a **dependency-ordered goal graph** — whose `G*.md` files use the **same five-element format** this repo's `/goal` produces, so they are directly executable via `/goal`-style KICK-OFF.
+
+| You want | Use | Repo |
+|---|---|---|
+| Converge a full product idea into a spec | `idea-to-spec` | spec-sonar |
+| Split a finished spec into dependency-ordered units | `goal-decomposer` | spec-sonar |
+| Polish ONE task into an iterable goal prompt | `/goal` | this repo |
+| Run the same check across N independent units | `workflow-shaper` | this repo |
+
+Full chain: `idea-to-spec → goal-decomposer → goals/G*.md → execute each via /goal-style KICK-OFF (depth), fan out homogeneous sub-tasks via workflow-shaper (breadth)`.
+
+### claude-skills-governance-meta — structure governance (結構治理)
+
+This repo shapes **what to do** (the task spec). Its governance companion shapes **how it's built** (the structure):
 
 > ### [`claude-skills-governance-meta`](https://github.com/dragon375014/claude-skills-governance-meta)
 > Defensive + offensive governance patterns: an architecture-completeness gate (catches "I want to build X" before it's built), cross-layer **trace-lock** (lock a write→display chain so "changed A, forgot B" can't happen), and runnable defensive linters.
