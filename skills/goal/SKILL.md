@@ -353,6 +353,7 @@ options:
   3. Subjective tasks (rubric.md exists): each round, spawn a reviewer agent to score the output against rubric.md; any dimension below the pass bar → list the specific violations → fix next round
   4. Record each round in the structure defined by the Iteration policy section
   5. Obey the Error handling section (max rounds, when to pause-and-report vs continue)
+  6. CLOSE THE LOOP — when you stop (whether the Outcome is met or you're blocked), update `~/.claude/goals/<name>/meta.json`: set `status` to `executed` (code done, may have manual-verify pending) or `blocked` (stuck per Error handling), and add an `execution` object recording `commit` / `files_changed` / `verification_done` / `verification_pending`. Then tell the user you've updated the goal status. Do this WITHOUT being asked — leaving status at `parked`/`draft` after executing is a loop-closure failure (forward-bias: lots of "go do it", no "record it's done").
 
   Do NOT ask "should I start", do NOT list a plan for confirmation, do NOT yield to the user. Use tools, edit files, run tests. Stop only when stuck (per Error handling).
 
