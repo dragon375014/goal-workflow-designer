@@ -216,6 +216,8 @@ question: "How do you prove it's done? What tool or check confirms it?"
 - If Phase 0b found a test framework (vitest, pytest, jest), proactively suggest: "I saw X — use it?"
 - "Eyeball it" → follow up: "Which specific screens / metrics?"
 
+**SBE 例證化驗收（分支 / 數值 / 資格 / 狀態類任務必做）**：任務含任何分支、數值、資格、狀態邏輯（定價 / 贈金 / 折扣 / 等級閘 / 庫存門檻 / 狀態轉移）時，抽象的「計算正確 / 測試通過」**不可接受**——評審 agent（與下游 specmit scorecard 棘輪）拿不到可重跑的具體標準。逼出 **SBE 表**：≥3 列「情境 × 具體輸入 → 預期輸出」、用真實數字、至少含 1 正常 + 1 邊界 + 1 fallback。追問：「給我 3 個以上『情境 × 具體輸入 → 預期輸出』的例子（真實數字）。」純展示 / 文件 / 無分支任務可略過、用上面的一般驗證即可。
+
 #### 5.3 Constraint (限制條件)
 ```
 question: "What files / modules / features absolutely cannot be touched? What styles / techniques are off-limits?"
@@ -451,7 +453,14 @@ After Q&A completes:
    <concrete state>
 
    # Verification
-   <how to verify>
+   <how to verify — 要跑的工具 / 檢查>
+
+   ## Acceptance examples (SBE 例證表)  ← 分支/數值/資格/狀態類必填；純展示/文件可省
+   | 情境 scenario | 具體輸入 input | 預期輸出 expected |
+   |---|---|---|
+   | <happy path>     | <真實數字> | <精確輸出> |
+   | <boundary 邊界>  | <真實數字> | <精確輸出> |
+   | <fallback/edge>  | <真實數字> | <精確輸出> |
 
    # Constraint
    - <ban 1>
@@ -544,6 +553,7 @@ options:
 
 - **Don't fabricate answers for the user.** Unanswered elements stay as `<TBD>` in goal.md. Don't ad-lib them in.
 - **Interrogating vague answers is mandatory, not optional.** Accepting "better / smoother" = skill failure.
+- **分支 / 數值 / 資格 / 狀態類任務沒有 SBE 例證表 = skill failure.** 驗證只寫「計算正確 / 測試通過」而無 `情境 × 輸入 → 輸出` 列，評審 agent 與 specmit scorecard 沒有可重跑的標準。要求 ≥3 列、真實數字、含正常 / 邊界 / fallback。
 - **Subjective tasks without a rubric = don't produce goal.md.** Pack a handoff instead.
 - **scan-summary must be referenced in later questions** — not just generated and forgotten.
 - **Context window health > flow completion.** If the user is context-strained, suggest a handoff. Don't push through.
