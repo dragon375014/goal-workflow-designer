@@ -4,6 +4,22 @@ All notable changes to `goal-workflow-designer` will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2026-07-01
+
+Closes the "goal guesses at an existing file's internals" blind spot, and lands a batch of field-applied improvements that had drifted into the running local copy without ever reaching this repo. Origin story: a 2026-07-01 crystallize-scan goal invented a non-existent `sessionData` field on `harvest-scan.mjs` — the whole SBE table built on air — caught only when a stronger model read the actual source. Under 0.3.0, Phase 0b would have forced the Explore scan to return `harvest-scan.mjs`'s real `footprint / insight / content` shape, blocking the guess at design time (a real counter-example, not a hypothetical).
+
+### Added
+
+- **`goal`: Phase 0b mutation-aware read-source branch (Step 3)** — when a goal's outcome is "modify / extend an existing file or module", the codebase scan flips from *optional* to **REQUIRED**, and the Explore subagent must return the target file's **real data contract** (資料結構 / 函式簽名 / I/O shape / external-interface-vs-internal-implementation gap), which is written into goal.md's `Codebase Context`. Greenfield / pure copy-editing goals keep the scan optional (no over-scanning). This is the precise fix for goals that infer a file's internals from its output / log instead of reading the source.
+- **`goal`: Honesty rule "Don't fabricate the codebase either"** — sister clause to "Don't fabricate answers for the user". Any data field / function signature / interface cited in goal.md's `Codebase Context` or SBE table must be **read from source in Phase 0b**, never inferred; a guessed shape = skill failure (symmetric with the SBE 「沒真實數字 = skill failure」rule), with an explicit stop-signal for when you're citing something you haven't opened.
+- **`goal`: verification SBE 例證化 discipline (Step 5.2 + Honesty Rules)** — branch / numeric / eligibility / state tasks must emit an SBE table (≥3 rows of 情境 × 具體輸入 → 預期輸出, real numbers, ≥1 happy + 1 boundary + 1 fallback); an abstract "calculation correct / tests pass" is a skill failure because the reviewer agent + downstream specmit scorecard get no re-runnable criterion. (Shipped in commit `cd70b3c`, previously un-changelogged — folded in here.)
+- **`goal`: Step 5.7 — Workflow & relation reality-check** — for any UI / operator-workflow task, four probes beyond 5.6's blocked-state coverage: entry-point enumeration, current-workflow walkthrough, relation direction, existing / migration data. The single most common feature miss is shipping to one surface while the operator's real entry is another. (Field-backported from the running local copy.)
+- **`goal`: two Honesty rules** — decisions go through `AskUserQuestion`, not prose (collapsing several forks into a text list + 「全照建議」silently strips the forcing function); and run Step 5.7 for any UI / operator-workflow task. (Field-backported.)
+
+### Changed
+
+- **`goal`: core principle #5 expanded — "1–3 questions per round — but loop, never collapse"** — never dump several decisions into a prose list + 「全照建議 / all recommended」to save clicks; each genuine fork gets its own `AskUserQuestion` round with the recommended choice first. (Field-backported.)
+
 ## [0.2.1] - 2026-06-10
 
 Ecosystem conflict fixes — driven by a real-world conflict analysis run by the companion repo [spec-sonar](https://github.com/dragon375014/spec-sonar)'s Conflict Analysis Mode, which scanned the 4 skills (goal, workflow-shaper, idea-to-spec, goal-decomposer) coexisting in one environment and found 5 conflicts. Full report: spec-sonar `examples/conflict-report-goal-workflow-designer.md`.

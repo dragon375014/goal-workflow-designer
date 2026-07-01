@@ -56,7 +56,7 @@ This skill automates that forcing function.
 2. **Match user's language / 配合使用者語言**: Detect what language the user opens with. If Chinese, conduct the Q&A in Chinese with English term parentheticals. If English, conduct in English with Chinese term parentheticals. Bilingual terms either way.
 3. **Smart skipping / 智慧跳問**: Before each round, scan everything the user has already said + any Phase 0b scan results. Mark elements as already-known and **skip them**.
 4. **Interrogate vague answers / 追問模糊回答**: When the user says "better / smoother / more professional / 好一點 / 比較順", you **must** follow up for a measurable or visible standard. Accepting vague answers = skill failure.
-5. **1–3 questions per round**: Use `AskUserQuestion` progressively. Long question lists make users abandon.
+5. **1–3 questions per round — but loop, never collapse / 寧可多輪，禁止塌成文字**: Use `AskUserQuestion` progressively. Long lists make users abandon — BUT when real decisions exceed one round (or AskUserQuestion's 4-question cap), **fire multiple rounds**. **Never** dump several decisions into a prose list + 「全照建議 / all recommended」to save clicks — that silently strips the forcing function and reverts to the informal「聊一聊就開寫」mode this skill exists to fix. Each genuine fork gets its own `AskUserQuestion` option set with the recommended choice first.
 6. **Cite examples to seed thinking**: Offer source-talk examples like "e.g. response time under 0.2s", but tell users not to copy verbatim.
 7. **Subjective tasks require a rubric**: No rubric = the reviewer agent has nothing to judge against = wasted tokens.
 8. **Context window health above all**: Phase 0a is a gatekeeper. If the user's context is unhealthy, advise restart. Do not push through to "finish the skill".
@@ -91,7 +91,12 @@ options:
 - **Pack handoff** → jump to **Step 9 — Handoff packaging**
 - **Aware but continue** → continue to Step 3; throughout the rest of the flow, condense replies, skip non-essential follow-ups
 
-### Step 3 — Phase 0b: Codebase Scan (optional)
+### Step 3 — Phase 0b: Codebase Scan (optional for greenfield — REQUIRED for mutation tasks / 改既有檔必跑)
+
+**First, detect mutation intent (先偵測「改既有檔」意圖)**: does the task description / outcome say it will **modify / extend / add to an existing file or module** (改／擴展／加到某個既有檔案或模組)?
+
+- **Mutation task (改既有檔)** → the scan is **REQUIRED, not optional**. Skip the yes/no ask (or still present it but flag「改既有檔強烈建議掃描」), and the Explore subagent **must return the target file's real data contract (真實資料契約)** — see the 4th Return item below. This is the exact gap that lets a goal guess at fields / signatures that don't exist: the fix is to **read the source, not its output / log**.
+- **Greenfield (新建檔) / pure copy-editing (純文案／設定)** → scan stays **optional** (別把所有 goal 都逼 scan → 過度). Ask as normal below.
 
 Ask if user wants a scan of the working directory:
 
@@ -103,7 +108,7 @@ options:
   - { label: "No, skip",   description: "Treat this as a context-free greenfield task" }
 ```
 
-**If scan**:
+**If scan** (always run this for mutation tasks):
 1. Extract keywords from the user's initial description (filenames / function names / tech stack mentions) as search seeds
 2. **Spawn an `Explore` subagent** to isolate the scan from the main conversation context:
 
@@ -119,7 +124,8 @@ options:
      - 3-5 relevant files/functions with paths
      - Detected test tools (if any)
      - Any important existing implementation patterns
-     Under 250 words."
+     - **If this goal will mutate a file / module X: return X's REAL data contract (真實資料契約) — key data structures, function signatures, input / output shape, AND the gap between X's external interface / output and its internal implementation.** Don't just say 'X is relevant'; open the file and read it. This item defends against inferring X's internals from its output / log (改既有檔時本項必答).
+     Under 300 words."
    )
    ```
 
@@ -128,6 +134,7 @@ options:
 5. **This summary MUST be referenced in Step 5 (Phase B) questions**, e.g.:
    - On Constraint: "I saw `validatePayment` in `src/checkout/` — keep it untouched?"
    - On Verification: "I saw `vitest` configured — use the existing test runner?"
+6. **Mutation tasks — write the returned data contract into goal.md's `Codebase Context` section (Step 10).** Discipline (鐵律): any field name / function signature the later **Outcome** or **SBE table** cites **must come from this verified contract — never guessed**. If you're about to name a field / signature you haven't actually read from source → stop, read it first.
 
 **If skip**: jump straight to Step 4.
 
@@ -255,6 +262,17 @@ options:
 - 若選「需要明確呈現」→ 在 **Outcome** 寫入四點 blocked-state contract，並在 **Verification** 加「逐一目視每個渲染面（不只一面）」。
 - **追問 surface 清單**：「哪些畫面會顯示這個項目 / 這個動作按鈕？」逐一列出（提醒：storefront 常有 2-4 種 card layout，別只改一個）。
 - 對應執行時 skill：`action-gating-surface-disclosure`（動手改閘門時會自動觸發，與本步互為設計時 / 執行時雙保險）。
+
+#### 5.7 Workflow & relation reality-check (現況工作流 + 關係方向 — UI／操作型任務必問)
+
+5.6 抓的是「被擋狀態 + 顯示面」。但功能開發最貴的 miss 是**另一類**：功能蓋在某個面、但操作者真正的入口是另一個面；關係從錯的一邊接；既有資料沒有進來的路。5.6 接不住這些。對任何**碰使用者面或操作流**的任務（純後端 / 資料 only 跳過），跑這四個 probe（每個都是一輪 `AskUserQuestion` 或追問）：
+
+1. **入口枚舉 (entry-point enumeration)** — 「你**現在實際**是在哪個畫面做這件事？這功能會出現 / 被操作在**幾個**地方？」逐一列出、**全做**。經典坑：蓋在全域 modal、上線後才發現操作者其實是從 detail 頁的表單做（同一功能常有 2-4 個入口 / 顯示元件）。
+2. **現況走查 (current-workflow walkthrough)** — 「用你現在的做法，**一步一步走給我看** — 點哪、填哪、看到什麼。」敘述真實點擊路徑會逼出看不見的標籤（「這欄填 0 是什麼意思？」）、真入口、操作者心智模型。
+3. **關係方向 (relation direction)** — 任何「A 對應 B」的功能（卡↔課、標籤↔項目、規則↔對象）必問 **「這個對應你想從**哪一邊**設定？」** 選錯邊（在 A 設 vs 在 B 設）＝整個重做。
+4. **既有／遷移資料 (existing / migration data)** — 「現有的舊資料 / 半完成的資料怎麼進這個新功能？」happy-path 預設 greenfield；真實資料常是半成品 / 匯入 / 中間態（如一張已用一半的卡）。
+
+把答案收進 **Outcome**（要覆蓋的 surface 清單、關係由哪一邊設、遷移資料怎麼處理）與 **Verification**（逐一目視**每個**枚舉到的 surface，不只一個）。
 
 ### Step 6 — Phase C: Rubric (subjective tasks only)
 
@@ -552,8 +570,11 @@ options:
 ## Honesty Rules (誠實守則)
 
 - **Don't fabricate answers for the user.** Unanswered elements stay as `<TBD>` in goal.md. Don't ad-lib them in.
+- **Don't fabricate the codebase either (別替 codebase 編資料結構).** Any data field, function signature, or interface that goal.md's `Codebase Context` / SBE table cites **must be read from source in Phase 0b** — never inferred from output / log / interface. A guessed data shape = skill failure (symmetric with the SBE 「沒真實數字 = skill failure」rule below). Stop-signal (停手訊號): you're writing the SBE table or Outcome, you cite a field / function, but you **haven't actually opened that file** → stop, read it first, then write.
 - **Interrogating vague answers is mandatory, not optional.** Accepting "better / smoother" = skill failure.
 - **分支 / 數值 / 資格 / 狀態類任務沒有 SBE 例證表 = skill failure.** 驗證只寫「計算正確 / 測試通過」而無 `情境 × 輸入 → 輸出` 列，評審 agent 與 specmit scorecard 沒有可重跑的標準。要求 ≥3 列、真實數字、含正常 / 邊界 / fallback。
+- **Decisions go through `AskUserQuestion`, not prose.** Collapsing several forks into a text list + 「全照建議」to dodge multiple rounds = skill failure (it removes the forcing function). Loop rounds instead.
+- **Run Step 5.7 for any UI／operator-workflow task.** Skipping entry-point enumeration / current-workflow walkthrough / relation-direction / migration-data = the single most common feature miss (ship to one surface, miss the real one).
 - **Subjective tasks without a rubric = don't produce goal.md.** Pack a handoff instead.
 - **scan-summary must be referenced in later questions** — not just generated and forgotten.
 - **Context window health > flow completion.** If the user is context-strained, suggest a handoff. Don't push through.
