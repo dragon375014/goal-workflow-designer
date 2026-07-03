@@ -181,7 +181,7 @@ Before task classification, decide whether this task is **even appropriate for `
      Alternative paths:
      - If business decision → resolve with stakeholders / yourself first, come back with the decision as outcome
      - If "waiting on external" → /goal after the reply arrives
-     - If pure research/exploration → /graphify or Plan mode is better suited
+     - If pure research/exploration → Plan mode is better suited
      - If you want /goal for the "uncertain → certain" stretch → rewrite as "gather X/Y/Z info and produce comparison report" — that makes outcome concrete
      ```
      **Skill ends here.** Do not produce goal.md.
