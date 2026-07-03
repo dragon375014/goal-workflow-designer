@@ -274,6 +274,25 @@ options:
 
 把答案收進 **Outcome**（要覆蓋的 surface 清單、關係由哪一邊設、遷移資料怎麼處理）與 **Verification**（逐一目視**每個**枚舉到的 surface，不只一個）。
 
+#### 5.8 Surface contract (顯示狀態 + 接縫對帳 — 碰任何 UI 面的任務必做)
+
+5.6 抓「被擋狀態」、5.7 抓「入口與關係方向」。兩者都沒問過「這個面本身四種狀態要顯示什麼」與「後端產出的東西前端有沒有跟上」——這是實測發生過的病灶（loading 宣告了沒接、初次讀取失敗與空清單顯示成同一個畫面、後端新增的錯誤碼沒進前端映射表，三者全部零測試/build 訊號）。對任何**碰 UI 面**的任務（純後端 / 資料 only 跳過）：
+
+```
+question: "這個任務觸碰到的每個畫面／元件，四種狀態各自要顯示什麼？① 空資料 ② 載入中（初次載入與動作觸發的載入分開想）③ 錯誤 ④ 資料很多（分頁/上限）。每一態給一個明確決定，或「不做，因為…」"
+header: "Surface states"
+```
+
+- **具體性門檻（比照 SBE 鐵律；狀態行不接受同義反覆，不能只做存在級檢查）**：每一態的決定必須交代三件事——① 呈現在哪個元件/位置 ② 實際文案或資料來源 ③ 與其他態（尤其錯誤 vs 空資料）的具體區分點。命中以下任一 = 套話，必須追問到補齊：
+  1. 決定文字只是重複狀態名稱本身（「錯誤：顯示錯誤訊息」「載入：顯示載入中」，零額外資訊）→ 追問：「顯示在哪、文案寫什麼？」
+  2. 錯誤態與空資料態的呈現位置或判斷邏輯完全相同，使用者無法分辨「真的沒資料」vs「讀取失敗」→ 追問：「這兩種情況畫面上看起來一樣嗎？使用者要怎麼知道是哪一種？」（這是已發生過的具體事故：admin 訂單頁的「初次載入失敗」與「目前沒有訂單」共用同一行文字位置）
+- **接縫對帳（差集，驗收時機械執行）**——追問並寫進 Verification：
+  - 「後端這個功能會 raise / 回傳的錯誤碼，全部列出來；前端錯誤映射表接住了哪些？」（驗收：grep 後端 RAISE/error code 對 grep 前端 map key，取差集）
+  - 「後端這個實體回傳的欄位，全部列出來；哪些前端有顯示、哪些故意不顯示？」（驗收：grep select/回傳欄位 對 grep 前端渲染，取差集）
+  - 「有沒有哪個能力是先做 mock / 之後才接真的？如果有，操作這個功能的人在畫面上看得出來嗎？」（驗收：mock 標記 ↔ UI 揭露）
+- 差集只有兩個合法結果：補進 Verification 的驗收項，或寫進 Outcome 的「明確延後」清單。**沉默差集（沒問過、沒寫進任何地方）不接受**，比照 SBE 鐵律。
+- 收進 **Outcome**（每面的狀態決定 + 明確延後清單）與 **Verification**（三條接縫差集怎麼機械核對）。
+
 ### Step 6 — Phase C: Rubric (subjective tasks only)
 
 Follow the 6-step SOP from the source talk, with step 1 (baseline) externalized:
@@ -575,6 +594,7 @@ options:
 - **分支 / 數值 / 資格 / 狀態類任務沒有 SBE 例證表 = skill failure.** 驗證只寫「計算正確 / 測試通過」而無 `情境 × 輸入 → 輸出` 列，評審 agent 與 specmit scorecard 沒有可重跑的標準。要求 ≥3 列、真實數字、含正常 / 邊界 / fallback。
 - **Decisions go through `AskUserQuestion`, not prose.** Collapsing several forks into a text list + 「全照建議」to dodge multiple rounds = skill failure (it removes the forcing function). Loop rounds instead.
 - **Run Step 5.7 for any UI／operator-workflow task.** Skipping entry-point enumeration / current-workflow walkthrough / relation-direction / migration-data = the single most common feature miss (ship to one surface, miss the real one).
+- **UI 面的任務沒有 Surface contract = skill failure.** Verification 只寫「動作能成功執行」而不含每個面的狀態行與接縫行 = skill failure，比照 SBE 鐵律。**狀態行的具體性門檻比照 SBE**：決定文字同義反覆（如僅「顯示錯誤訊息」不交代位置/文案），或錯誤態與空資料態共用相同呈現位置卻無區分，一律視同未填，retry 直到補齊三要素（位置/內容/區分點）——這條不是假設風險，是實測發生過的漏洞（admin 訂單頁初次讀取失敗與空清單顯示成同一個畫面）。
 - **Subjective tasks without a rubric = don't produce goal.md.** Pack a handoff instead.
 - **scan-summary must be referenced in later questions** — not just generated and forgotten.
 - **Context window health > flow completion.** If the user is context-strained, suggest a handoff. Don't push through.
