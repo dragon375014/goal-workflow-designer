@@ -250,6 +250,12 @@ npx specmit init
 
 ---
 
+## 📮 這個工具背後的故事
+
+我是一人品牌創辦人，白天烘豆、晚上跟 AI 一起把這套工具鏈生出來。開發過程（連同踩過的坑）我都寫成文章，放在 **[coffeeshooters.com/content](https://coffeeshooters.com/content)**——可以先讀 **[以魔法剋魔法：`/goal` skill 怎麼把模糊任務反問成精準的 goal prompt](https://coffeeshooters.com/content/skill-to-goal-magic-defeats-magic)**。兩週一封電子報，不轟炸信箱，在任何一篇文章都能訂閱。
+
+---
+
 如果這兩支 skill 幫你省下了一次 debug、或一次白跑的 `/goal`，請我喝杯咖啡不強求但很開心。這裡全部 MIT、無條件免費使用。
 
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/Z8C420A0VI)

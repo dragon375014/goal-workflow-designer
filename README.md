@@ -213,6 +213,12 @@ PRs and issues welcome. A few principles:
 
 ---
 
+## 📮 The story behind this
+
+I'm a solo dev running a coffee brand who taught myself to build this toolchain with AI. I write up the reasoning (and the scars) at **[coffeeshooters.com/content](https://coffeeshooters.com/content)** — start with **[Magic Defeats Magic: how the `/goal` skill interrogates a vague task into a precise goal prompt](https://coffeeshooters.com/content/skill-to-goal-magic-defeats-magic)**. Two-week newsletter, no spam — subscribe on any article.
+
+---
+
 If either skill saved you a debugging session or a wasted `/goal` run, a ko-fi is appreciated but not expected. Everything here is MIT and free to use unconditionally.
 
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/Z8C420A0VI)
